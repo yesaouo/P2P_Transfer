@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>P2P Transfer</title>
+	<script src="peerjs.min.js"></script>
+    <script src="qrcode.min.js"></script>
+</head>
+<body>
+	<h1>P2P Transfer</h1>
+    <div id="qrcode"></div>
+	<p>Your local Peer ID is: <span id="local-peer-id"></span></p>
+	<label for="remote-peer-id">Enter remote Peer ID:</label>
+	<input type="text" id="remote-peer-id">
+	<button id="connect-btn">Connect</button>
+    <hr>
+    <h2>Text transfer</h2>
+    <label for="text-input">Enter the text to send:</label>
+    <textarea id="text-input"></textarea>
+	<button id="text-send-btn" disabled>Send text</button>
+	<hr>
+	<h2>File transfer</h2>
+	<label for="file-input">Choose a file to send:</label>
+	<input type="file" id="file-input">
+	<button id="file-send-btn" disabled>Send file</button>
+    <div id="files"></div>
+<script>
+const urlParams = new URLSearchParams(window.location.search);
+const remotePeerId = urlParams.get("id");
+const peer = new Peer();
+
+function connectRemote(remotePeerId) {
+  console.log('Connected to remote peer:', remotePeerId);
+  document.getElementById('connect-btn').disabled = true;
+  document.getElementById('text-send-btn').disabled = false;
+  document.getElementById('file-send-btn').disabled = false;
+}
+
+peer.on('open', (id) => {
+  console.log(`Peer ID: ${id}`);
+  document.getElementById('local-peer-id').innerHTML = id;
+  // 將本地的 Peer ID 轉換成 QR 碼
+  let url = window.location.protocol + "//" + window.location.host + location.pathname + "?id=" + id;
+  console.log(url);
+  new QRCode(document.getElementById("qrcode"), {
+    text: url,
+    width: 256,
+    height: 256,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H,
+  });
+  if(remotePeerId != null) {
+    const conn = peer.connect(remotePeerId);
+    conn.on('open', () => {
+      document.getElementById('remote-peer-id').value = remotePeerId;
+      document.getElementById('remote-peer-id').readOnly = true;
+      connectRemote(remotePeerId);
+    });
+  }
+});
+
+peer.on('connection', (conn) => {
+  console.log(`Connected to ${conn.peer}`);
+  // 監聽連接的 data 事件
+  conn.on('data', (data) => {
+    console.log(`Received data from ${conn.peer}: ${data}`);
+
+    if (data.data instanceof ArrayBuffer) {
+      console.log('Received an ArrayBuffer!');
+      const blob = new Blob([data.data], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.name;
+      link.innerHTML = `${data.name}`;
+      document.getElementById('files').appendChild(link);
+      document.getElementById('files').appendChild(document.createElement('br'));
+    } else if (data.data instanceof Blob) {
+      console.log('Received a blob!');
+      const url = URL.createObjectURL(data.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.name;
+      link.innerHTML = `${data.name}`;
+      document.getElementById('files').appendChild(link);
+    } else {
+      console.log('Received data:', data);
+      document.getElementById('text-input').value = data;
+    }
+  });
+});
+
+peer.on('error', (error) => {
+  console.error(error);
+});
+
+// Connect to remote peer
+document.getElementById('connect-btn').addEventListener('click', () => {
+  const remotePeerId = document.getElementById('remote-peer-id').value;
+  const conn = peer.connect(remotePeerId);
+  conn.on('open', () => {
+	connectRemote(remotePeerId);
+  });
+});
+
+// Send text to remote peer
+document.getElementById('text-send-btn').addEventListener('click', () => {
+  const text = document.getElementById('text-input').value;
+  const conn = peer.connect(document.getElementById('remote-peer-id').value);
+  conn.on('open', () => {
+    console.log('Sending text to remote peer...');
+    conn.send(text);
+  });
+});
+
+// Send file to remote peer
+document.getElementById('file-send-btn').addEventListener('click', () => {
+  const fileInput = document.getElementById('file-input');
+  const file = fileInput.files[0];
+  const fileName = file.name;
+  const conn = peer.connect(document.getElementById('remote-peer-id').value);
+  conn.on('open', () => {
+    console.log('Sending file to remote peer...');
+    conn.send({ name: fileName, data: file });
+  });
+});
+
+</script>
+</body>
+</html>
