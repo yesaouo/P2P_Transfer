@@ -32,10 +32,12 @@ const remotePeerId = urlParams.get("id");
 const peer = new Peer();
 
 function connectRemote(remotePeerId) {
-  console.log('Connected to remote peer:', remotePeerId);
+  console.log('Connected to ', remotePeerId);
   document.getElementById('connect-btn').disabled = true;
   document.getElementById('text-send-btn').disabled = false;
   document.getElementById('file-send-btn').disabled = false;
+  document.getElementById('remote-peer-id').readOnly = true;
+  document.getElementById('remote-peer-id').value = remotePeerId;
 }
 
 peer.on('open', (id) => {
@@ -54,16 +56,13 @@ peer.on('open', (id) => {
   });
   if(remotePeerId != null) {
     const conn = peer.connect(remotePeerId);
-    conn.on('open', () => {
-      document.getElementById('remote-peer-id').value = remotePeerId;
-      document.getElementById('remote-peer-id').readOnly = true;
-      connectRemote(remotePeerId);
-    });
+    conn.on('open', () => { connectRemote(remotePeerId); });
   }
 });
 
 peer.on('connection', (conn) => {
   console.log(`Connected to ${conn.peer}`);
+  document.getElementById('remote-peer-id').value = conn.peer;
   // 監聽連接的 data 事件
   conn.on('data', (data) => {
     console.log(`Received data from ${conn.peer}: ${data}`);
@@ -101,9 +100,7 @@ peer.on('error', (error) => {
 document.getElementById('connect-btn').addEventListener('click', () => {
   const remotePeerId = document.getElementById('remote-peer-id').value;
   const conn = peer.connect(remotePeerId);
-  conn.on('open', () => {
-	connectRemote(remotePeerId);
-  });
+  conn.on('open', () => { connectRemote(remotePeerId); });
 });
 
 // Send text to remote peer
