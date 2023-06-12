@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>P2P Transfer</title>
+	<script src="peerjs.min.js"></script>
+  <script src="qrcode.min.js"></script>
+</head>
+<body>
+	<h1>P2P Transfer</h1>
+    <div id="qrcode"></div>
+	  <p>Your local Peer ID is: <span id="local-peer-id"></span></p>
+	  <label for="remote-peer-id">Enter remote Peer ID:</label>
+	  <input type="text" id="remote-peer-id">
+	  <button id="connect-btn">Connect</button>
+  <hr><h2>Text transfer</h2>
+    <label for="text-input">Enter the text to send:</label>
+    <textarea id="text-input"></textarea>
+	  <button id="text-send-btn" disabled>Send text</button>
+	<hr><h2>File transfer</h2>
+	  <label for="file-input">Choose a file to send:</label>
+	  <input type="file" id="file-input">
+	  <button id="file-send-btn" disabled>Send file</button>
+    <div id="files"></div>
+  <hr><h2>Screen share</h2>
+    <button id="screen-share-btn" disabled>Start Share</button>
+    <div id="screenshare">
+      <video id="screenshare-video"></video>
+    </div>
+<script>
+let stream, share = false;
+const screenshareVideo = document.getElementById('screenshare-video');
+const urlParams = new URLSearchParams(window.location.search);
+const remotePeerId = urlParams.get("id");
+const peer = new Peer();
+
+function connectRemote(remotePeerId) {
+  console.log('Connected to ', remotePeerId);
+  document.getElementById('connect-btn').disabled = true;
+  document.getElementById('text-send-btn').disabled = false;
+  document.getElementById('file-send-btn').disabled = false;
+  document.getElementById('screen-share-btn').disabled = false;
+  document.getElementById('remote-peer-id').readOnly = true;
+  document.getElementById('remote-peer-id').value = remotePeerId;
+}
+
+peer.on('open', (id) => {
+  console.log(`Peer ID: ${id}`);
+  document.getElementById('local-peer-id').innerHTML = id;
+  // 將本地的 Peer ID 轉換成 QR 碼
+  let url = window.location.protocol + "//" + window.location.host + location.pathname + "?id=" + id;
+  console.log(url);
+  new QRCode(document.getElementById("qrcode"), {
+    text: url,
+    width: 256,
+    height: 256,
+    colorDark: "#000000",
+    colorLight: "#ffffff",
+    correctLevel: QRCode.CorrectLevel.H,
+  });
+  if(remotePeerId != null) {
+    const conn = peer.connect(remotePeerId);
+    conn.on('open', () => { connectRemote(remotePeerId); });
+  }
+});
+
+peer.on('connection', (conn) => {
+  console.log(`Connected to ${conn.peer}`);
+  document.getElementById('remote-peer-id').value = conn.peer;
+
+  conn.on('data', (data) => {
+    console.log(`Received data from ${conn.peer}: ${data}`);
+
+    if (data.data instanceof ArrayBuffer) {
+      console.log('Received an ArrayBuffer!');
+      const blob = new Blob([data.data], { type: 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.name;
+      link.innerHTML = `${data.name}`;
+      document.getElementById('files').appendChild(link);
+      document.getElementById('files').appendChild(document.createElement('br'));
+    } else if (data.data instanceof Blob) {
+      console.log('Received a blob!');
+      const url = URL.createObjectURL(data.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = data.name;
+      link.innerHTML = `${data.name}`;
+      document.getElementById('files').appendChild(link);
+    } else {
+      console.log('Received data:', data);
+      document.getElementById('text-input').value = data;
+    }
+  });
+});
+
+peer.on('error', (error) => {
+  console.error(error);
+});
+
+// Connect to remote peer
+document.getElementById('connect-btn').addEventListener('click', () => {
+  const remotePeerId = document.getElementById('remote-peer-id').value;
+  const conn = peer.connect(remotePeerId);
+  conn.on('open', () => { connectRemote(remotePeerId); });
+});
+
+// Send text to remote peer
+document.getElementById('text-send-btn').addEventListener('click', () => {
+  const text = document.getElementById('text-input').value;
+  const conn = peer.connect(document.getElementById('remote-peer-id').value);
+  conn.on('open', () => {
+    console.log('Sending text to remote peer...');
+    conn.send(text);
+  });
+});
+
+// Send file to remote peer
+document.getElementById('file-send-btn').addEventListener('click', () => {
+  const fileInput = document.getElementById('file-input');
+  const file = fileInput.files[0];
+  const fileName = file.name;
+  const conn = peer.connect(document.getElementById('remote-peer-id').value);
+  conn.on('open', () => {
+    console.log('Sending file to remote peer...');
+    conn.send({ name: fileName, data: file });
+  });
+});
+
+// Share screen to remote peer
+async function startScreenShare() {
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: true });
+    screenshareVideo.srcObject = stream;
+    screenshareVideo.play();
+    const call = peer.call(remotePeerId, stream);
+  } catch (error) {
+    console.error('Error starting screen share:', error);
+  }
+}
+function endScreenShare() {
+  try {
+    const tracks = stream.getTracks();
+    tracks.forEach(track => track.stop());
+    screenshareVideo.srcObject = null;
+  } catch (error) {
+    console.error('Error ending screen share:', error);
+  }
+}
+document.getElementById('screen-share-btn').addEventListener('click', () => {
+  if(!share) {
+    share = true;
+    document.getElementById('screen-share-btn').innerHTML = 'Stop Share';
+    startScreenShare();
+  }else{
+    share = false;
+    document.getElementById('screen-share-btn').innerHTML = 'Start Share';
+    endScreenShare();
+  }
+});
+peer.on('call', (call) => {
+  console.log(`Received call from ${call.peer}`);
+  call.answer();
+  call.on('stream', (stream) => {
+    console.log('Received stream:', stream);
+    screenshareVideo.srcObject = stream;
+    screenshareVideo.play();
+  });
+});
+
+</script>
+</body>
+</html>
