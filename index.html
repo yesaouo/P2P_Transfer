@@ -10,7 +10,19 @@
     <script src="peerjs.min.js"></script>
     <script src="qrcode.min.js"></script>
     <style>
-        *{padding: 0; margin: 0; box-sizing: border-box; font-family: 'Heebo', sans-serif;}
+        *{
+            padding: 0; margin: 0; box-sizing: border-box; font-family: 'Heebo', sans-serif;
+            user-select: none;
+            -webkit-user-select: none; /* 兼容 WebKit 浏览器 */
+            -moz-user-select: none; /* 兼容 Firefox 浏览器 */
+            -ms-user-select: none; /* 兼容 IE/Edge 浏览器 */
+        }
+        .message {
+            user-select: text;
+            -webkit-user-select: text; /* 兼容 WebKit 浏览器 */
+            -moz-user-select: text; /* 兼容 Firefox 浏览器 */
+            -ms-user-select: text; /* 兼容 IE/Edge 浏览器 */
+        }
         html, body {width: 100%; height: 100%;}
         .fl {float: left;}
         .fr {float: right;}
@@ -38,6 +50,7 @@
             font-size: 15px;
             font-weight: 600;
             color: #494949;
+            cursor: pointer;
         }
         .chat-wrap-main{
             width: 100%; 
@@ -96,12 +109,8 @@
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
         }
         dialog::backdrop {background-color: rgba(0, 0, 0, 0.3);}
-        dialog textarea {
-            width: 100%;
-            resize: none;
-            border: none;
-            outline: none;
-        }
+        dialog textarea {width: 100%; resize: none; border: none; outline: none;}
+        dialog .container {display: flex; flex-direction: column; align-items: stretch;}
         .bottom button, .round-button {
             margin-right: 5px;
             width: 40px;
@@ -114,13 +123,8 @@
             color: #fff;
             cursor: pointer;
         }
-        .round-button {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .round-button {display: flex; align-items: center; justify-content: center;}
         .round-button img {width: 15px;}
-        dialog .container {display: flex; flex-direction: column; align-items: stretch;}
         .button-container {display: flex; width: 100%;}
 
         #file-input {display: none;}
@@ -135,16 +139,16 @@
      </style>
 </head>
 <body>
-    <div class="chat-wrap-top">
+    <div class="chat-wrap-top" onclick="copyPeerID();">
         <h3 id="chat-title"></h3>
     </div>
     <div class="chat-wrap-main" id="chat-wrap">
         <div id="chat-con"><br><br></div>
         <div class="bottom">
             <input type="text" id="sendTxt" placeholder="Enter remote Peer ID or scan the QR code">
-            <button id="stikBtn"><img src="img/cool.png"></button>
+            <button id="stikBtn" onclick="dialogSticker.showModal();"><img src="img/cool.png"></button>
             <label for="file-input" class="round-button"><img src="img/plus.png"></label><input type="file" id="file-input" onchange="fileChange()">
-            <button id="sendBtn"><img src="img/send.png"></button>
+            <button id="sendBtn" onclick="sendMsg();"><img src="img/send.png"></button>
         </div>
     </div> 
     <div id="qrcode"></div>
@@ -153,8 +157,8 @@
         <div class="container">
             <textarea rows="30" id="multiText"></textarea>
             <div class="button-container">
-                <button id="multiExitBtn">Exit</button>
-                <button id="multiSendBtn">Send</button>
+                <button id="multiExitBtn" onclick="dialogTextarea.close();">Exit</button>
+                <button id="multiSendBtn" onclick="sendMultiText();">Send</button>
             </div>
         </div>
     </dialog>
@@ -167,14 +171,10 @@ var connections = [];
 var fileExtension = "txt";
 const qrcode = document.getElementById('qrcode');
 const sendTxt = document.getElementById('sendTxt');
-const sendBtn = document.getElementById('sendBtn');
-const stikBtn = document.getElementById('stikBtn');
 const chatCon = document.getElementById('chat-con');
 const dialogSticker = document.getElementById('dialogSticker');
 const dialogTextarea = document.getElementById('dialogTextarea');
 const multiText = document.getElementById('multiText');
-const multiSendBtn = document.getElementById('multiSendBtn');
-const multiExitBtn = document.getElementById('multiExitBtn');
 const hasConnect = 'Type a message'
 const notConnect = 'Enter remote Peer ID or scan the QR code'
 
@@ -252,6 +252,16 @@ peer.on('connection', (conn) => {
 });
 peer.on('error', (error) => {console.error(error);});
 
+function copyPeerID() {
+    var text = document.getElementById('chat-title').innerHTML;
+    var textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0, text.length);
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+}
 function sendMsg() {
     var txt = sendTxt.value;
     sendTxt.value = "";
@@ -305,6 +315,11 @@ function sendFile(name, file) {
     sendTxt.disabled = false;
     sendTxt.placeholder = connections.length > 0 ? hasConnect : notConnect;
 }
+function sendMultiText() {
+    const blob = new Blob([multiText.value], {type: `text/${fileExtension},charset=UTF-8`});
+    sendFile(`text.${fileExtension}`, blob);
+    dialogTextarea.close();
+}
 function fileChange() {
     var file = document.getElementById('file-input').files[0];
     if (file) {
@@ -333,14 +348,6 @@ function Keydown(e) {
     if(e.keyCode==13) {sendMsg();}
 }
 document.addEventListener('keydown', Keydown, false);
-sendBtn.onclick = function() {sendMsg();}
-stikBtn.onclick = function() {dialogSticker.showModal();}
-multiSendBtn.onclick = function() {
-    const blob = new Blob([multiText.value], {type: `text/${fileExtension},charset=UTF-8`});
-    sendFile(`text.${fileExtension}`, blob);
-    dialogTextarea.close();
-}
-multiExitBtn.onclick = function() {dialogTextarea.close();}
 document.onclick = function(e) {
     if(e.target.id == 'dialogSticker') {dialogSticker.close();}
     else if(e.target.id.indexOf('sticker') == 0) {
