@@ -19,7 +19,7 @@ self.addEventListener('install', (e) => {
         caches.open('ChatP2P-store').then((cache) => cache.addAll(assets)),
     );
 });
-self.addEventListener("activate", (event) => {
+self.addEventListener("activate", (e) => {
     console.log("ready to handle fetches!");
     e.waitUntil(
         caches.keys().then((keyList) => {
