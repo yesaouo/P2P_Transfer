@@ -4,6 +4,7 @@
     "id": "/P2P_Transfer/",
     "start_url": "/P2P_Transfer/",
     "display": "standalone",
+    "theme_color": "#1D3557",
     "background_color": "#1D3557",
     "description": "Command and transmit multiple lines of text like a breeze! Experience true real-time P2P chat with our PeerJS Chatroom!",
     "icons": [
