@@ -355,7 +355,7 @@ window.onload = function() {
     for(var i=0;i<40;i++) {str += `<img src="stickers/sticker${i}.png" class="stickers" id="sticker${i}">`;}
     dialogSticker.innerHTML = str;
     if('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('/P2P_Transfer/sw.js')
             .then(() => { console.log('Service Worker Registered'); });
     }
     document.getElementById('share' in navigator ? 'btnShare' : 'btnCopy').style.display = 'block';
