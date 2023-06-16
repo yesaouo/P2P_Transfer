@@ -2,13 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="theme-color" content="#1D3557">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatP2P</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="shortcut icon" href="img/icons/ChatP2P48.png">
-    <link rel="apple-touch-icon" href="img/icons/ChatP2P192.png">
+    <link rel="shortcut icon" href="img/tgdy.png">
     <script src="peerjs.min.js"></script>
     <script src="qrcode.min.js"></script>
     <style>
@@ -39,19 +36,21 @@
         .item-left .message, .item-right .message {font-size: 15px; font-weight: 400; padding: 15px !important; margin-top: 20px;}
         .chat-item {width: 100%; margin-bottom: 20px; position: relative;}
         .chat-item .message {display: block; padding: 10px;}
-        .chat-wrap-top {
+
+        .chat-wrap-top{
             position: fixed;
             width: 100%;
             background-color: white;
             box-shadow: 0px -7px 15px #c3c4dd;
             padding: 15px;
             text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
-        .chat-wrap-top h3 {font-size: 15px; font-weight: 600; color: #494949;}
-        .chat-wrap-top img {display: none; width: 25px; padding: 5px; cursor: pointer;}
+        .chat-wrap-top h3{
+            font-size: 15px;
+            font-weight: 600;
+            color: #494949;
+            cursor: pointer;
+        }
         .chat-wrap-main{
             width: 100%; 
             height: 100%;
@@ -99,6 +98,18 @@
             padding: 0 15px;
             box-shadow: 0px 0px 12px #d5d6e5;
         }
+        dialog{
+            box-shadow: 0 2px 6px #ccc;
+            border-radius: 10px;
+            z-index: 99;
+            min-width: 302px;
+            width: 80%;
+            max-width: 746px;
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+        dialog::backdrop {background-color: rgba(0, 0, 0, 0.3);}
+        dialog textarea {width: 100%; resize: none; border: none; outline: none;}
+        dialog .container {display: flex; flex-direction: column; align-items: stretch;}
         .bottom button, .round-button {
             margin-right: 5px;
             width: 40px;
@@ -111,21 +122,10 @@
             color: #fff;
             cursor: pointer;
         }
-        dialog{
-            box-shadow: 0 2px 6px #ccc;
-            border-radius: 10px;
-            z-index: 99;
-            min-width: 302px;
-            width: 80%;
-            max-width: 746px;
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        }
-        dialog::backdrop {background-color: rgba(0, 0, 0, 0.3);}
-        dialog textarea {width: 100%; resize: none; border: none; outline: none;}
         .round-button {display: flex; align-items: center; justify-content: center;}
         .round-button img {width: 15px;}
-        .container {display: flex; flex-direction: column; align-items: stretch;}
         .button-container {display: flex; width: 100%;}
+
         #file-input {display: none;}
         #qrcode {position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);}
         #sendBtn,#stikBtn,#fileBtn{display: flex; justify-content: center; align-items: center;}
@@ -135,13 +135,11 @@
         #multiSendBtn:hover {background-color: #45a049;}
         #multiExitBtn:hover {background-color: #d32f2f;}
         #multiSendBtn, #multiExitBtn {width: 50%; color: white; border: none; padding: 10px 15px; font-size: 14px; cursor: pointer; transition: background-color 0.3s;}
-    </style>
+     </style>
 </head>
 <body>
-    <div class="chat-wrap-top">
-        <h3 id="chatTitle"></h3>
-        <img src="img/duplicate.png" id="btnCopy" onclick="copyID();">
-        <img src="img/share.png" id="btnShare" onclick="shareID();">
+    <div class="chat-wrap-top" onclick="copyPeerID();">
+        <h3 id="chat-title"></h3>
     </div>
     <div class="chat-wrap-main" id="chat-wrap">
         <div id="chat-con"><br><br></div>
@@ -166,12 +164,10 @@
 <script>
 const urlParams = new URLSearchParams(window.location.search);
 const remotePeerId = urlParams.get("id");
+// 建立 PeerJS 對象
 const peer = new Peer();
-var myID = "";
-var myURL = "";
 var connections = [];
 var fileExtension = "txt";
-const chatTitle = document.getElementById('chatTitle');
 const qrcode = document.getElementById('qrcode');
 const sendTxt = document.getElementById('sendTxt');
 const chatCon = document.getElementById('chat-con');
@@ -182,12 +178,11 @@ const hasConnect = 'Type a message'
 const notConnect = 'Enter remote Peer ID or scan the QR code'
 
 peer.on('open', (id) => {
-    myID = id;
-    myURL = window.location.protocol + "//" + window.location.host + location.pathname + "?id=" + id;
-    chatTitle.innerHTML = id + chatTitle.innerHTML;
-    console.log(myURL);
+    document.getElementById('chat-title').innerHTML = id;
+    let url = window.location.protocol + "//" + window.location.host + location.pathname + "?id=" + id;
+    console.log(url);
     new QRCode(qrcode, {
-        text: myURL,
+        text: url,
         width: 256,
         height: 256,
         colorDark: "#000000",
@@ -256,6 +251,16 @@ peer.on('connection', (conn) => {
 });
 peer.on('error', (error) => {console.error(error);});
 
+function copyPeerID() {
+    var text = document.getElementById('chat-title').innerHTML;
+    var textarea = document.createElement("textarea");
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    textarea.setSelectionRange(0, text.length);
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+}
 function sendMsg() {
     var txt = sendTxt.value;
     sendTxt.value = "";
@@ -354,31 +359,7 @@ window.onload = function() {
     var str='';
     for(var i=0;i<40;i++) {str += `<img src="stickers/sticker${i}.png" class="stickers" id="sticker${i}">`;}
     dialogSticker.innerHTML = str;
-    if('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-            .then(() => { console.log('Service Worker Registered'); });
-    }
-    document.getElementById('share' in navigator ? 'btnShare' : 'btnCopy').style.display = 'block';
 };
-function shareID() {
-    const shareOpts = {
-        title: '加入 ChatP2P 聊天室，與我一起交流！',
-        text: '點擊連結加入 ChatP2P 聊天室，我們可以立即開始聊天，分享想法和訊息！',
-        url: myURL,
-    };
-    navigator.share(shareOpts).then((e) => {
-        console.log('navigator.share succeeded.');
-    }).catch((error) => {console.error(error);});
-}
-function copyID() {
-    var textarea = document.createElement("textarea");
-    textarea.value = myID;
-    document.body.appendChild(textarea);
-    textarea.select();
-    textarea.setSelectionRange(0, myID.length);
-    document.execCommand("copy");
-    document.body.removeChild(textarea);
-}
 </script>
 </body>
 </html>
