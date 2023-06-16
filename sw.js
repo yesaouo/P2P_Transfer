@@ -2,15 +2,15 @@ self.addEventListener('install', (e) => {
     console.log("installing…");
     e.waitUntil(
         caches.open('ChatP2P-store').then((cache) => cache.addAll([
-            '/index.html',
-            '/peerjs.min.js',
-            '/qrcode.min.js',
-            '/img/cool.png',
-            '/img/duplicate.png',
-            '/img/plus.png',
-            '/img/send.png',
-            '/img/share.png',
-            '/stickers/',
+            '/P2P_Transfer/index.html',
+            '/P2P_Transfer/peerjs.min.js',
+            '/P2P_Transfer/qrcode.min.js',
+            '/P2P_Transfer/img/cool.png',
+            '/P2P_Transfer/img/duplicate.png',
+            '/P2P_Transfer/img/plus.png',
+            '/P2P_Transfer/img/send.png',
+            '/P2P_Transfer/img/share.png',
+            '/P2P_Transfer/stickers/',
         ])),
     );
 });
