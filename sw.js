@@ -2,6 +2,7 @@ self.addEventListener('install', (e) => {
     console.log("installing…");
     e.waitUntil(
         caches.open('ChatP2P-store').then((cache) => cache.addAll([
+            '/P2P_Transfer/',
             '/P2P_Transfer/index.html',
             '/P2P_Transfer/peerjs.min.js',
             '/P2P_Transfer/qrcode.min.js',
