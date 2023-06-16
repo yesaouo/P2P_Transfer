@@ -1,18 +1,22 @@
+var assets = [
+    '/P2P_Transfer/index.html',
+    '/P2P_Transfer/peerjs.min.js',
+    '/P2P_Transfer/qrcode.min.js',
+    '/P2P_Transfer/img/cool.png',
+    '/P2P_Transfer/img/duplicate.png',
+    '/P2P_Transfer/img/plus.png',
+    '/P2P_Transfer/img/send.png',
+    '/P2P_Transfer/img/share.png'
+];
+for (var i = 0; i <= 39; i++) {
+    var stickerPath = '/P2P_Transfer/stickers/sticker' + i + '.png';
+    assets.push(stickerPath);
+}
+
 self.addEventListener('install', (e) => {
     console.log("installing…");
     e.waitUntil(
-        caches.open('ChatP2P-store').then((cache) => cache.addAll([
-            '/P2P_Transfer/',
-            '/P2P_Transfer/index.html',
-            '/P2P_Transfer/peerjs.min.js',
-            '/P2P_Transfer/qrcode.min.js',
-            '/P2P_Transfer/img/cool.png',
-            '/P2P_Transfer/img/duplicate.png',
-            '/P2P_Transfer/img/plus.png',
-            '/P2P_Transfer/img/send.png',
-            '/P2P_Transfer/img/share.png',
-            '/P2P_Transfer/stickers/',
-        ])),
+        caches.open('ChatP2P-store').then((cache) => cache.addAll(assets)),
     );
 });
 self.addEventListener("activate", (event) => {
