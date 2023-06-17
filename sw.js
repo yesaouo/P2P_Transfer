@@ -1,5 +1,6 @@
 let cacheName = "ChatP2P-store";
 var assets = [
+    '/P2P_Transfer/',
     '/P2P_Transfer/index.html',
     '/P2P_Transfer/peerjs.min.js',
     '/P2P_Transfer/qrcode.min.js',
