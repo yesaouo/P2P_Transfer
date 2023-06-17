@@ -1,4 +1,4 @@
-let cacheName = "store-v1";
+let cacheName = "store-v1.0";
 var assets = [
     '/P2P_Transfer/',
     '/P2P_Transfer/index.html',
@@ -17,7 +17,7 @@ for (var i = 0; i <= 39; i++) {
 }
 
 self.addEventListener('install', (e) => {
-    console.log("install", e.request.url);
+    console.log("installing...");
     e.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(assets)));
 });
 self.addEventListener("activate", (e) => {
