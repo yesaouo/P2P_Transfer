@@ -2,7 +2,7 @@
     "name": "ChatP2P",
     "short_name": "ChatP2P",
     "id": "/P2P_Transfer/",
-    "start_url": "/P2P_Transfer/index.html",
+    "start_url": "/P2P_Transfer/",
     "display": "standalone",
     "theme_color": "#1D3557",
     "background_color": "#1D3557",
