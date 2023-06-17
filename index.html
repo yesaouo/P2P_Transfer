@@ -51,7 +51,7 @@
             align-items: center;
         }
         .chat-wrap-top h3 {font-size: 15px; font-weight: 600; color: #494949;}
-        .chat-wrap-top img {display: none; width: 25px; padding: 5px; cursor: pointer;}
+        .chat-wrap-top img {display: none; margin-left: 5px; cursor: pointer;}
         .chat-wrap-main{
             width: 100%; 
             height: 100%;
@@ -123,13 +123,11 @@
         dialog::backdrop {background-color: rgba(0, 0, 0, 0.3);}
         dialog textarea {width: 100%; resize: none; border: none; outline: none;}
         .round-button {display: flex; align-items: center; justify-content: center;}
-        .round-button img {width: 15px;}
         .container {display: flex; flex-direction: column; align-items: stretch;}
         .button-container {display: flex; width: 100%;}
         #file-input {display: none;}
         #qrcode {position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);}
-        #sendBtn,#stikBtn,#fileBtn{display: flex; justify-content: center; align-items: center;}
-        #sendBtn img,#stikBtn img,#fileBtn img{width: 15px;}
+        .bottom button {display: flex; justify-content: center; align-items: center;}
         #multiSendBtn {background-color: #4caf50;}
         #multiExitBtn {background-color: #f44336;}
         #multiSendBtn:hover {background-color: #45a049;}
@@ -140,16 +138,22 @@
 <body>
     <div class="chat-wrap-top">
         <h3 id="chatTitle"></h3>
-        <img src="img/duplicate.png" id="btnCopy" onclick="copyID();">
-        <img src="img/share.png" id="btnShare" onclick="shareID();">
+        <img width="15" height="15" alt="copy" src="img/duplicate.png" id="btnCopy" onclick="copyID();">
+        <img width="15" height="15" alt="share" src="img/share.png" id="btnShare" onclick="shareID();">
     </div>
     <div class="chat-wrap-main" id="chat-wrap">
         <div id="chat-con"><br><br></div>
         <div class="bottom">
             <input type="text" id="sendTxt" placeholder="Enter remote Peer ID or scan the QR code">
-            <button id="stikBtn" onclick="dialogSticker.showModal();"><img src="img/cool.png"></button>
-            <label for="file-input" class="round-button"><img src="img/plus.png"></label><input type="file" id="file-input" onchange="fileChange()">
-            <button id="sendBtn" onclick="sendMsg();"><img src="img/send.png"></button>
+            <button aria-label="stikBtn" onclick="dialogSticker.showModal();">
+                <img width="20" height="20" alt="stickers" src="img/cool.png">
+            </button>
+            <label for="file-input" class="round-button">
+                <img width="15" height="15" alt="add file" src="img/plus.png">
+            </label><input type="file" id="file-input" onchange="fileChange()">
+            <button aria-label="sendBtn" onclick="sendMsg();">
+                <img width="15" height="15" alt="send msg" src="img/send.png">
+            </button>
         </div>
     </div> 
     <div id="qrcode"></div>
