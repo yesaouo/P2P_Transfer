@@ -138,7 +138,7 @@
 </head>
 <body>
     <div class="chat-wrap-top">
-        <h3 id="chatTitle"></h3>
+        <h3 id="chatTitle">offline</h3>
         <img width="15" height="15" alt="copy" src="img/duplicate.png" id="btnCopy" onclick="copyID();">
         <img width="15" height="15" alt="share" src="img/share.png" id="btnShare" onclick="shareID();">
     </div>
@@ -157,7 +157,9 @@
             </button>
         </div>
     </div> 
-    <div id="qrcode"></div>
+    <div id="qrcode">
+        <img width="256" height="256" alt="offline" src="img/wifi-slash.png">
+    </div>
     <dialog id="dialogSticker"></dialog>
     <dialog id="dialogTextarea">
         <div class="container">
@@ -189,8 +191,9 @@ const notConnect = 'Enter remote Peer ID or scan the QR code'
 peer.on('open', (id) => {
     myID = id;
     myURL = window.location.protocol + "//" + window.location.host + location.pathname + "?id=" + id;
-    chatTitle.innerHTML = id + chatTitle.innerHTML;
     console.log(myURL);
+    chatTitle.innerHTML = id;
+    qrcode.innerHTML = "";
     new QRCode(qrcode, {
         text: myURL,
         width: 256,
@@ -346,25 +349,6 @@ function ScrollText() {
 function Keydown(e) {
     if(e.keyCode==13) {sendMsg();}
 }
-document.addEventListener('keydown', Keydown, false);
-document.onclick = function(e) {
-    if(e.target.id == 'dialogSticker') {dialogSticker.close();}
-    else if(e.target.id.indexOf('sticker') == 0) {
-        sendTxt.value = `/${e.target.id}`;
-        sendMsg();
-        dialogSticker.close();
-    }
-}
-window.onload = function() {
-    var str='';
-    for(var i=0;i<40;i++) {str += `<img src="stickers/sticker${i}.png" class="stickers" id="sticker${i}">`;}
-    dialogSticker.innerHTML = str;
-    if('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/P2P_Transfer/sw.js')
-            .then(() => { console.log('Service Worker Registered'); });
-    }
-    document.getElementById('share' in navigator ? 'btnShare' : 'btnCopy').style.display = 'block';
-};
 function shareID() {
     const shareOpts = {
         title: '加入 ChatP2P 聊天室，與我一起交流！',
@@ -384,6 +368,25 @@ function copyID() {
     document.execCommand("copy");
     document.body.removeChild(textarea);
 }
+document.addEventListener('keydown', Keydown, false);
+document.onclick = function(e) {
+    if(e.target.id == 'dialogSticker') {dialogSticker.close();}
+    else if(e.target.id.indexOf('sticker') == 0) {
+        sendTxt.value = `/${e.target.id}`;
+        sendMsg();
+        dialogSticker.close();
+    }
+}
+window.onload = function() {
+    var str='';
+    for(var i=0;i<40;i++) {str += `<img src="stickers/sticker${i}.png" class="stickers" id="sticker${i}">`;}
+    dialogSticker.innerHTML = str;
+    if('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/P2P_Transfer/sw.js')
+            .then(() => { console.log('Service Worker Registered'); });
+    }
+    document.getElementById('share' in navigator ? 'btnShare' : 'btnCopy').style.display = 'block';
+};
 </script>
 </body>
 </html>

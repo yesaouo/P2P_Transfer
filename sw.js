@@ -8,7 +8,8 @@ var assets = [
     '/P2P_Transfer/img/duplicate.png',
     '/P2P_Transfer/img/plus.png',
     '/P2P_Transfer/img/send.png',
-    '/P2P_Transfer/img/share.png'
+    '/P2P_Transfer/img/share.png',
+    '/P2P_Transfer/img/wifi-slash.png'
 ];
 for (var i = 0; i <= 39; i++) {
     var stickerPath = '/P2P_Transfer/stickers/sticker' + i + '.png';
@@ -16,22 +17,22 @@ for (var i = 0; i <= 39; i++) {
 }
 
 self.addEventListener('install', (e) => {
-    console.log("在安裝階段預先緩存遊戲資源", e.request.url);
+    console.log("install", e.request.url);
     e.waitUntil(caches.open(cacheName).then((cache) => cache.addAll(assets)));
 });
 self.addEventListener("activate", (e) => {
-    console.log("ready to handle fetches!", e.request.url);
+    console.log("ready to handle fetches!");
     e.waitUntil(
         caches.keys().then((keyList) => {
             return Promise.all(
                 keyList.map((key) => {
-                    if (key !== cacheName) {caches.delete(key);}
+                    if (key !== cacheName) {return caches.delete(key);}
                 })
             );
         })
     );
 });  
 self.addEventListener('fetch', (e) => {
-    console.log("監聽 fetch 事件並處理離線情況", e.request.url);
-    e.respondWith(caches.match(e.request).then((response) => response || fetch(e.request)),);
+    console.log("fetch", e.request.url);
+    e.respondWith(caches.match(e.request).then((response) => response || fetch(e.request)));
 });
