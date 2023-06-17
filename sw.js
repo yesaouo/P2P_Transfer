@@ -1,4 +1,4 @@
-let cacheName = "ChatP2P-store";
+let cacheName = "store-v1";
 var assets = [
     '/P2P_Transfer/',
     '/P2P_Transfer/index.html',
