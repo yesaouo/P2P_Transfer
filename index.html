@@ -267,7 +267,13 @@ peer.on('connection', (conn) => {
     });
     console.log("當前連接的 Peer ID：", connections);
 });
-peer.on('error', (error) => {console.error(error);});
+peer.on('error', (error) => {
+    console.error(error.type);
+    setTimeout(() => {
+        console.log("Attempting to reconnect...");
+        peer.reconnect();
+    }, 1000); // 1秒後重新嘗試連線
+});
 
 function sendMsg() {
     var txt = sendTxt.value;

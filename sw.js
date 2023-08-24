@@ -1,4 +1,4 @@
-let cacheName = "store-v2.01";
+let cacheName = "store-v2.02";
 var assets = [
     '/P2P_Transfer/',
     '/P2P_Transfer/index.html',
