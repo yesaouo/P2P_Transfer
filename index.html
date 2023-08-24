@@ -173,12 +173,7 @@
 <script>
 const urlParams = new URLSearchParams(window.location.search);
 const remotePeerId = urlParams.get("id");
-const peer = new Peer({
-    config: {
-        iceServers: [{ urls: 'stun:stun.l.google.com:19302' }],
-    },
-    heartbeatInterval: 5000,
-});
+const peer = new Peer();
 var myID = "";
 var myURL = "";
 var connections = [];
@@ -256,7 +251,7 @@ peer.on('connection', (conn) => {
                     </span>
                 </div>`;
         } else {
-            console.log('Received a text:', data);
+            console.log('Received a text');
             chatCon.innerHTML += 
                 `<div class="chat-item item-left rela">
                     <span class="abs uname">${conn.peer}</span>
@@ -345,12 +340,12 @@ function fileChange() {
         sendTxt.placeholder = connections.length > 0 ? hasConnect : notConnect;
     }
 }
-function connectRemote(remotePeerId) {
-    if (connections.indexOf(remotePeerId) === -1) {
-        connections.push(remotePeerId);
+function connectRemote(id) {
+    if (connections.indexOf(id) === -1) {
+        connections.push(id);
         qrcode.style.display = 'none';
         sendTxt.placeholder = hasConnect;
-        console.log('Connected to ', remotePeerId);
+        console.log('Connected to', id);
     }
 }
 function ScrollText() {
