@@ -13,164 +13,216 @@
     <script src="peerjs.min.js"></script>
     <script src="qrcode.min.js"></script>
     <style>
-        *{
-            padding: 0; margin: 0; box-sizing: border-box; font-family: 'Heebo', sans-serif;
-            user-select: none;
-            -webkit-user-select: none; /* 兼容 WebKit 浏览器 */
-            -moz-user-select: none; /* 兼容 Firefox 浏览器 */
-            -ms-user-select: none; /* 兼容 IE/Edge 浏览器 */
-        }
-        .message {
-            user-select: text;
-            -webkit-user-select: text; /* 兼容 WebKit 浏览器 */
-            -moz-user-select: text; /* 兼容 Firefox 浏览器 */
-            -ms-user-select: text; /* 兼容 IE/Edge 浏览器 */
-        }
-        html, body {width: 100%; height: 100%;}
-        .fl {float: left;}
-        .fr {float: right;}
-        .abs {position: absolute;}
-        .rela {position: relative;}
-        .stickers {width: 74px; cursor: pointer;}
-        .item-left .uname {left: 0px;}
-        .item-right .uname {right: 0px;}
-        .item-left .uname, .item-right .uname {font-size: 12px; top: 0; color: gray;}
-        .item-left .message {background: #1D3557; color: white; border-radius: 0px 15px 15px 15px;}
-        .item-right .message {background: white; color: #1D3557; border-radius: 15px 0px 15px 15px; margin-right: 0;}
-        .item-left .message, .item-right .message {font-size: 15px; font-weight: 400; padding: 15px !important; margin-top: 20px;}
-        .chat-item {width: 100%; margin-bottom: 20px; position: relative;}
-        .chat-item .message {display: block; padding: 10px;}
-        .chat-wrap-top {
-            position: fixed;
-            width: 100%;
-            background-color: white;
-            box-shadow: 0px -7px 15px #c3c4dd;
-            padding: 15px;
-            text-align: center;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .chat-wrap-top h3 {font-size: 15px; font-weight: 600; color: #494949;}
-        .chat-wrap-top img {display: none; margin-left: 5px; cursor: pointer;}
-        .chat-wrap-main{
-            width: 100%; 
-            height: 100%;
-            overflow-y:scroll; 
-            background-color: #f4f4f4;
-            text-align:center;
-            padding: 0 25px;
-            padding-bottom: 75px;
-        }
-        #chat-con{
-            padding: 10px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        #chat-con p{
-            width: 50%;
-            padding: 5px 20px; 
-            font-size: 12px;
-            border-radius:5px;
-            margin: 15px 0;
-            color: gray;
-            border-radius: 20px;
-            opacity: .7;
-        }
-        .bottom {
-            position:fixed;
-            bottom:0; 
-            left: 0; 
-            width:100%; 
-            height: 80px;
-            background: rgba(255,255,255,.8);
-            padding-top: 20px;
-            display: flex;
-        }
-        .bottom input {
-            width: calc(100% - 150px); 
-            margin: 0 15px;
-            height: 40px;
-            border-radius: 35px;
-            float:left;
-            border:none;
-            outline: none;
-            line-height: 50px;
-            padding: 0 15px;
-            box-shadow: 0px 0px 12px #d5d6e5;
-        }
-        .bottom button, .round-button {
-            margin-right: 5px;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            float: right;
-            border: none;
-            background: #1D3557;
-            outline: none;
-            color: #fff;
-            cursor: pointer;
-        }
-        dialog{
-            box-shadow: 0 2px 6px #ccc;
-            border-radius: 10px;
-            z-index: 99;
-            min-width: 302px;
-            width: 80%;
-            max-width: 746px;
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        }
-        dialog::backdrop {background-color: rgba(0, 0, 0, 0.3);}
-        dialog textarea {width: 100%; resize: none; border: none; outline: none;}
-        .round-button {display: flex; align-items: center; justify-content: center;}
-        .container {display: flex; flex-direction: column; align-items: stretch;}
-        .button-container {display: flex; width: 100%;}
-        #file-input {display: none;}
-        #qrcode {position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);}
-        .bottom button {display: flex; justify-content: center; align-items: center;}
-        #multiSendBtn {background-color: #4caf50;}
-        #multiExitBtn {background-color: #f44336;}
-        #multiSendBtn:hover {background-color: #45a049;}
-        #multiExitBtn:hover {background-color: #d32f2f;}
-        #multiSendBtn, #multiExitBtn {width: 50%; color: white; border: none; padding: 10px 15px; font-size: 14px; cursor: pointer; transition: background-color 0.3s;}
+*{
+    padding: 0;
+    margin: 0;
+    font-family: 'Heebo', sans-serif;
+    user-select: none;
+    -webkit-user-select: none; /* 兼容 WebKit 浏览器 */
+    -moz-user-select: none; /* 兼容 Firefox 浏览器 */
+    -ms-user-select: none; /* 兼容 IE/Edge 浏览器 */
+}
+html, body {
+    width: 100%;
+    height: 100%;
+}
+button, label {
+    cursor: pointer;
+}
+
+header {
+    width: 100%;
+    padding: 15px 0;
+    position: fixed;
+    top: 0;
+    text-align: center;
+    background-color: white;
+    box-shadow: 0px -7px 15px #c3c4dd;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+header span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #494949;
+}
+header img {
+    width: 16px;
+    height: 16px;
+    display: none;
+    margin-left: 5px;
+    cursor: pointer;
+}        
+
+main {
+    width: 100%;
+	position: fixed;
+	top: 48px;
+	bottom: 68px;
+	overflow-y: scroll;
+	padding: 10px;
+	box-sizing: border-box;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+}
+.chat-item {
+    width: 100%;
+    margin-bottom: 15px;
+    position: relative;
+}
+.uname {
+    top: 0;
+    color: gray;
+    font-size: 12px;
+    position: absolute;
+}
+.message {
+    padding: 15px;
+    margin-top: 20px;
+    max-width: 50%;
+    word-wrap: break-word;
+    user-select: text;
+    -webkit-user-select: text; /* 兼容 WebKit 浏览器 */
+    -moz-user-select: text; /* 兼容 Firefox 浏览器 */
+    -ms-user-select: text; /* 兼容 IE/Edge 浏览器 */
+}
+.message img {
+    width: 100px;
+    height: 100px;
+}
+.item-left .uname {
+    left: 0px;
+}
+.item-left .message {
+    float: left;
+    color: white;
+    background: #1D3557;
+    border-radius: 0px 15px 15px 15px;
+}
+.item-right .uname {
+    right: 0px;
+}
+.item-right .message {
+    float: right;
+    color: #1D3557;
+    background: white;
+    border-radius: 15px 0px 15px 15px;
+}
+
+footer {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 0;
+    position: fixed;
+    bottom: 0;
+    background: rgba(255,255,255,.8);
+    display: flex;
+}
+#textInput {
+    width: 100%; 
+    margin: 0 10px;
+    padding: 0 15px;
+    border-radius: 35px;
+    border: none;
+    outline: none;
+    box-shadow: 0px 0px 12px #d5d6e5;
+}
+.sendBtns {
+    width: 144px;
+    height: 48px;
+    display: flex;
+}
+.sendBtns input {
+    display: none;
+}
+.sendBtns img {
+    width: 16px;
+    height: 16px;
+}
+.sendBtns button, .sendBtns label {
+    width: 44px;
+    height: 44px;
+    margin: 2px;
+    background: #1D3557;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+dialog[open] {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+	margin-top: 50px;
+    width: 100%;
+    max-width: 100%;
+    box-shadow: 0 2px 6px #ccc;
+    box-sizing: border-box;
+}
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.3);
+}
+dialog textarea {
+    width: 100%;
+    resize: none;
+    border: none;
+    outline: none;
+}
+.button-container {
+    width: 100%;
+    display: flex;
+}
+.stickers {
+    width: 74px;
+    height: 74px;
+    cursor: pointer;
+}
+#qrcode {position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);}
+#qrcode img {width: 256px; height: 256px;}
+#multiSendBtn {background-color: #4caf50;}
+#multiExitBtn {background-color: #f44336;}
+#multiSendBtn:hover {background-color: #45a049;}
+#multiExitBtn:hover {background-color: #d32f2f;}
+#multiSendBtn, #multiExitBtn {width: 50%; color: white; border: none; padding: 10px 15px; font-size: 14px; transition: background-color 0.3s;}
     </style>
 </head>
 <body>
-    <div class="chat-wrap-top">
-        <h3 id="chatTitle">offline</h3>
-        <img width="15" height="15" alt="copy" src="img/duplicate.png" id="btnCopy" onclick="copyID();">
-        <img width="15" height="15" alt="share" src="img/share.png" id="btnShare" onclick="shareID();">
-    </div>
-    <div class="chat-wrap-main" id="chat-wrap">
-        <div id="chat-con"><br><br></div>
-        <div class="bottom">
-            <input type="text" id="sendTxt" placeholder="Enter remote Peer ID or scan the QR code">
+    <header>
+        <span id="headerText">offline</span>
+        <img alt="copy" src="img/duplicate.png" id="btnCopy" onclick="copyID();">
+        <img alt="share" src="img/share.png" id="btnShare" onclick="shareID();">
+    </header>
+    <main></main>
+    <footer>
+        <input type="text" id="textInput" placeholder="Enter remote Peer ID or scan the QR code">
+        <div class="sendBtns">
             <button aria-label="stikBtn" onclick="dialogSticker.showModal();">
-                <img width="20" height="20" alt="stickers" src="img/cool.png">
+                <img alt="stickers" src="img/cool.png">
             </button>
-            <label for="file-input" class="round-button">
-                <img width="15" height="15" alt="add file" src="img/plus.png">
-            </label><input type="file" id="file-input" onchange="fileChange()">
+            <label for="fileInput">
+                <img alt="add file" src="img/plus.png">
+            </label><input type="file" id="fileInput" onchange="fileChange()">
             <button aria-label="sendBtn" onclick="sendMsg();">
-                <img width="15" height="15" alt="send msg" src="img/send.png">
+                <img alt="send msg" src="img/send.png">
             </button>
         </div>
-    </div> 
-    <div id="qrcode">
-        <img width="256" height="256" alt="offline" src="img/wifi-slash.png">
-    </div>
+    </footer>
+    <div id="qrcode"><img alt="offline" src="img/wifi-slash.png"></div>
     <dialog id="dialogSticker"></dialog>
     <dialog id="dialogTextarea">
-        <div class="container">
-            <textarea rows="30" id="multiText"></textarea>
-            <div class="button-container">
-                <button id="multiExitBtn" onclick="dialogTextarea.close();">Exit</button>
-                <button id="multiSendBtn" onclick="sendMultiText();">Send</button>
-            </div>
+        <textarea rows="30" id="multiText"></textarea>
+        <div class="button-container">
+            <button id="multiExitBtn" onclick="dialogTextarea.close();">Exit</button>
+            <button id="multiSendBtn" onclick="sendMultiText();">Send</button>
         </div>
     </dialog>
 <script>
+const mainElement = document.querySelector('main');
 const urlParams = new URLSearchParams(window.location.search);
 const remotePeerId = urlParams.get("id");
 const peer = new Peer();
@@ -178,13 +230,6 @@ var myID = "";
 var myURL = "";
 var connections = [];
 var fileExtension = "txt";
-const chatTitle = document.getElementById('chatTitle');
-const qrcode = document.getElementById('qrcode');
-const sendTxt = document.getElementById('sendTxt');
-const chatCon = document.getElementById('chat-con');
-const dialogSticker = document.getElementById('dialogSticker');
-const dialogTextarea = document.getElementById('dialogTextarea');
-const multiText = document.getElementById('multiText');
 const hasConnect = 'Type a message'
 const notConnect = 'Enter remote Peer ID or scan the QR code'
 
@@ -192,7 +237,7 @@ peer.on('open', (id) => {
     myID = id;
     myURL = window.location.protocol + "//" + window.location.host + location.pathname + "?id=" + id;
     console.log(myURL);
-    chatTitle.innerHTML = id;
+    headerText.innerHTML = id;
     qrcode.innerHTML = "";
     new QRCode(qrcode, {
         text: myURL,
@@ -213,7 +258,7 @@ peer.on('connection', (conn) => {
     if (connections.indexOf(conn.peer) === -1) {
         connections.push(conn.peer);
         qrcode.style.display = 'none';
-        sendTxt.placeholder = hasConnect;
+        textInput.placeholder = hasConnect;
     }
     // 斷開連接時
     conn.on('close', function() {
@@ -222,7 +267,7 @@ peer.on('connection', (conn) => {
             connections.splice(index, 1);
             if(connections.length === 0) {
                 qrcode.style.display = 'block';
-                sendTxt.placeholder = notConnect;
+                textInput.placeholder = notConnect;
             }
         }
     });
@@ -233,34 +278,42 @@ peer.on('connection', (conn) => {
             console.log('Received an ArrayBuffer');
             const blob = new Blob([data.data], {type: 'application/octet-stream'});
             const url = URL.createObjectURL(blob);
-            chatCon.innerHTML += 
-                `<div class="chat-item item-left rela">
-                    <span class="abs uname">${conn.peer}</span>
-                    <span class="fl message">
-                        <a href="${url}" download="${data.name}">${data.name}</a>
-                    </span>
-                </div>`;
+            const newDiv = document.createElement('div');
+            newDiv.className = 'chat-item item-left';
+            newDiv.innerHTML = `
+                <span class="uname">${conn.peer}</span>
+                <span class="message">
+                    <a href="${url}" download="${data.name}">${data.name}</a>
+                </span>
+            `;
+            mainElement.appendChild(newDiv);
         } else if (data.data instanceof Blob) {
             console.log('Received a blob');
             const url = URL.createObjectURL(data.data);
-            chatCon.innerHTML += 
-                `<div class="chat-item item-left rela">
-                    <span class="abs uname">${conn.peer}</span>
-                    <span class="fl message">
-                        <a href="${url}" download="${data.name}">${data.name}</a>
-                    </span>
-                </div>`;
+            const newDiv = document.createElement('div');
+            newDiv.className = 'chat-item item-left';
+            newDiv.innerHTML = `
+                <span class="uname">${conn.peer}</span>
+                <span class="message">
+                    <a href="${url}" download="${data.name}">${data.name}</a>
+                </span>
+            `;
+            mainElement.appendChild(newDiv);
         } else {
             console.log('Received a text');
-            chatCon.innerHTML += 
-                `<div class="chat-item item-left rela">
-                    <span class="abs uname">${conn.peer}</span>
-                    <span class="fl message">${data}</span>
-                </div>`;
+            const newDiv = document.createElement('div');
+            newDiv.className = 'chat-item item-left';
+            newDiv.innerHTML = `
+                <div class="chat-item item-left">
+                    <span class="uname">${conn.peer}</span>
+                    <span class="message">${data}</span>
+                </div>
+            `;
+            mainElement.appendChild(newDiv);
         }
         ScrollText();
     });
-    console.log("當前連接的 Peer ID：", connections);
+    console.log("當前連接的 Peer ID: ", connections);
 });
 peer.on('error', (error) => {
     console.error(error.type);
@@ -271,23 +324,25 @@ peer.on('error', (error) => {
 });
 
 function sendMsg() {
-    var txt = sendTxt.value;
-    sendTxt.value = "";
-    if(sendTxt.placeholder == notConnect) {
+    var txt = textInput.value;
+    textInput.value = "";
+    if(textInput.placeholder == notConnect) {
         peer.connect(txt).on('open', () => {connectRemote(txt);});
-    }else if(sendTxt.placeholder == hasConnect){
+    }else if(textInput.placeholder == hasConnect){
         if(txt == "") {return;}
         if(txt.startsWith("/.")) {
             fileExtension = txt.substring(2);
             if(fileExtension == "") {fileExtension = "txt"};
             dialogTextarea.showModal();
         }else{
-            if(txt.startsWith('/sticker')) {txt = `<img src="stickers${txt}.png" width="100px">`};
-            chatCon.innerHTML += 
-                `<div class="chat-item item-right">
-                    <span class="abs uname">me</span>
-                    <span class="message fr">${txt}</span>
-                </div>`;
+            if(txt.startsWith('/sticker')) {txt = `<img src="stickers${txt}.png">`};
+            const newDiv = document.createElement('div');
+            newDiv.className = 'chat-item item-right';
+            newDiv.innerHTML = `
+                <span class="uname">me</span>
+                <span class="message">${txt}</span>
+            `;
+            mainElement.appendChild(newDiv);
             ScrollText();
             for (var i = 0; i < connections.length; i++) {
                 const conn = peer.connect(connections[i]);
@@ -298,20 +353,21 @@ function sendMsg() {
             }
         }
     }else{
-        const fileInput = document.getElementById('file-input');
         const file = fileInput.files[0];
         sendFile(file.name, file);
     }
 }
 function sendFile(name, file) {
     const url = URL.createObjectURL(file);
-    chatCon.innerHTML += 
-        `<div class="chat-item item-right">
-            <span class="abs uname">me</span>
-            <span class="message fr">
-                <a href="${url}" download="${name}">${name}</a>
-            </span>
-        </div>`;
+    const newDiv = document.createElement('div');
+    newDiv.className = 'chat-item item-right';
+    newDiv.innerHTML = `
+        <span class="uname">me</span>
+        <span class="message">
+            <a href="${url}" download="${name}">${name}</a>
+        </span>
+    `;
+    mainElement.appendChild(newDiv);
     ScrollText();
     for (var i = 0; i < connections.length; i++) {
         const conn = peer.connect(connections[i]);
@@ -320,8 +376,8 @@ function sendFile(name, file) {
             conn.send({ name: name, data: file });
         });
     }
-    sendTxt.disabled = false;
-    sendTxt.placeholder = connections.length > 0 ? hasConnect : notConnect;
+    textInput.disabled = false;
+    textInput.placeholder = connections.length > 0 ? hasConnect : notConnect;
 }
 function sendMultiText() {
     const blob = new Blob([multiText.value], {type: `text/${fileExtension},charset=UTF-8`});
@@ -329,28 +385,27 @@ function sendMultiText() {
     dialogTextarea.close();
 }
 function fileChange() {
-    var file = document.getElementById('file-input').files[0];
+    var file = fileInput.files[0];
     if (file) {
         if(connections.length > 0) {
-            sendTxt.disabled = true;
-            sendTxt.placeholder = `Upload ${file.name}`;
+            textInput.disabled = true;
+            textInput.placeholder = `Upload ${file.name}`;
         }
     } else {
-        sendTxt.disabled = false;
-        sendTxt.placeholder = connections.length > 0 ? hasConnect : notConnect;
+        textInput.disabled = false;
+        textInput.placeholder = connections.length > 0 ? hasConnect : notConnect;
     }
 }
 function connectRemote(id) {
     if (connections.indexOf(id) === -1) {
         connections.push(id);
         qrcode.style.display = 'none';
-        sendTxt.placeholder = hasConnect;
+        textInput.placeholder = hasConnect;
         console.log('Connected to', id);
     }
 }
 function ScrollText() {
-    let h = document.getElementById('chat-wrap');
-    h.scrollTo(0, h.scrollHeight);
+    mainElement.scrollTo(0, mainElement.scrollHeight);
 }
 function Keydown(e) {
     if(e.keyCode==13) {sendMsg();}
@@ -378,7 +433,7 @@ document.addEventListener('keydown', Keydown, false);
 document.onclick = function(e) {
     if(e.target.id == 'dialogSticker') {dialogSticker.close();}
     else if(e.target.id.indexOf('sticker') == 0) {
-        sendTxt.value = `/${e.target.id}`;
+        textInput.value = `/${e.target.id}`;
         sendMsg();
         dialogSticker.close();
     }
